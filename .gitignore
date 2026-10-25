@@ -1,0 +1,33 @@
+
+---
+
+# 🚫 2️⃣ .gitignore (VERY IMPORTANT)
+
+Create `.gitignore` and paste this:
+
+```gitignore
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+env/
+
+# Data & models
+data/
+datasets/
+models/
+*.csv
+*.xlsx
+*.json
+*.pkl
+*.h5
+
+# Environment files
+.env
+
+# OS files
+.DS_Store
+Thumbs.db

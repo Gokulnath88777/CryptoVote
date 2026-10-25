@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - CryptoVote</title>
+  <style>
+*/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BODY */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fb;
+    color: #222;
+    min-height: 100vh;
+}
+
+/* NAVBAR */
+nav {
+    background: #ffffff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4f46e5;
+}
+
+.nav-right {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.results-link,
+.logout-btn {
+    text-decoration: none;
+    background: #4f46e5;
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.results-link:hover,
+.logout-btn:hover {
+    background: #4338ca;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 2rem;
+}
+
+/* WELCOME CARD */
+.welcome {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    margin-bottom: 2rem;
+}
+
+/* SECTION TITLE */
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* GRID */
+.candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 2rem;
+}
+
+/* CARD */
+.candidate-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.candidate-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.candidate-card.selected {
+    border-color: #4f46e5;
+}
+
+/* IMAGE ICON */
+.candidate-image {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+/* TEXT */
+.candidate-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.4rem;
+}
+
+.candidate-party {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+/* BUTTON */
+.select-btn {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.select-btn:hover {
+    background: #4338ca;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #ffffff;
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* FORM */
+.form-group {
+    margin-bottom: 1.3rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    transition: 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4f46e5;
+}
+
+/* FILE UPLOAD */
+.file-upload-btn {
+    border: 2px dashed #4f46e5;
+    padding: 1.5rem;
+    text-align: center;
+    border-radius: 8px;
+    background: #f9fafb;
+    cursor: pointer;
+}
+
+.file-upload-btn:hover {
+    background: #eef2ff;
+}
+
+/* SUBMIT BUTTON */
+.submit-vote-btn {
+    width: 100%;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.submit-vote-btn:hover {
+    background: #4338ca;
+}
+
+/* ERROR */
+.error-msg {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 2rem;
+    color: black;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    color: black;
+    margin-bottom: 3rem;
+}
+
+.header h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    text-shadow: none;
+}
+
+.header p {
+    font-size: 1.2rem;
+    opacity: 1;
+}
+
+/* RESULTS CARD */
+.results-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    margin-bottom: 2rem;
+}
+
+/* BAR CHART */
+.chart-container {
+    position: relative;
+    height: 400px;
+    margin-bottom: 2rem;
+}
+
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 100%;
+    padding: 1rem;
+    gap: 2rem;
+}
+
+.bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 200px;
+}
+
+.bar-container {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+}
+
+.bar {
+    width: 100%;
+    background: linear-gradient(to top, #667eea, #764ba2);
+    border-radius: 10px 10px 0 0;
+    transition: height 1s ease, transform 0.3s;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 1rem;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 -5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.bar:hover {
+    transform: scale(1.05);
+}
+
+.bar-label {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.candidate-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.candidate-name {
+    font-weight: bold;
+    color: black;
+    margin-bottom: 0.3rem;
+}
+
+.candidate-party {
+    font-size: 0.85rem;
+    color: #333;
+}
+
+/* STATS GRID */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-box {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+    color: black;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+}
+
+/* WINNER SECTION */
+.winner-section {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: black;
+}
+
+.winner-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.winner-section h2 {
+    color: black;
+    margin-bottom: 0.5rem;
+}
+
+.winner-section p {
+    color: #333;
+    font-size: 1.1rem;
+}
+
+/* BUTTON */
+.back-btn {
+    background: black;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: block;
+    margin: 2rem auto;
+    font-size: 1.1rem;
+}
+
+.back-btn:hover {
+    transform: scale(1.05);
+}
+
+/* NO DATA */
+.no-data {
+    text-align: center;
+    padding: 3rem;
+    color: #333;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .bar-chart {
+        flex-direction: column;
+        height: auto;
+        gap: 1rem;
+    }
+
+    .bar-wrapper {
+        max-width: 100%;
+    }
+
+    .bar-container {
+        height: 60px;
+        width: 100%;
+    }
+
+    .bar {
+        border-radius: 0 10px 10px 0;
+        flex-direction: row;
+        align-items: center;
+        padding: 0 1rem;
+    }
+}
+</style><style>
+
+/* ================= RESET ================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:#ffffff;
+    color:#111;
+    min-height:100vh;
+}
+
+/* ================= NAVBAR ================= */
+nav{
+    background:#ffffff;
+    padding:1rem 2rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.logo{
+    font-size:1.6rem;
+    font-weight:700;
+    color:#111;
+}
+
+.nav-right{
+    display:flex;
+    gap:1rem;
+}
+
+.results-link,
+.logout-btn{
+    background:#111;
+    color:white;
+    text-decoration:none;
+    padding:8px 18px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.results-link:hover,
+.logout-btn:hover{
+    background:#333;
+}
+
+/* ================= CONTAINER ================= */
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:2rem;
+}
+
+/* ================= WELCOME CARD ================= */
+.welcome{
+    background:#ffffff;
+    padding:2rem;
+    border-radius:12px;
+    border:1px solid #eee;
+    box-shadow:0 5px 15px rgba(0,0,0,0.05);
+    margin-bottom:2rem;
+}
+
+.section-title{
+    font-size:1.8rem;
+    font-weight:600;
+    margin-bottom:1.5rem;
+}
+
+/* ================= GRID ================= */
+.candidates-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:1.8rem;
+}
+
+/* ================= CARD ================= */
+.candidate-card{
+    background:#fff;
+    border-radius:12px;
+    padding:2rem;
+    text-align:center;
+    border:1px solid #e5e7eb;
+    transition:.3s;
+    cursor:pointer;
+}
+
+.candidate-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+.candidate-card.selected{
+    border:2px solid black;
+}
+
+.candidate-image{
+    font-size:3.5rem;
+    margin-bottom:1rem;
+}
+
+.candidate-card h3{
+    font-size:1.3rem;
+    margin-bottom:.4rem;
+}
+
+.candidate-party{
+    color:#555;
+    margin-bottom:1rem;
+}
+
+/* ================= BUTTON ================= */
+.select-btn{
+    background:black;
+    color:white;
+    border:none;
+    padding:.7rem 1.8rem;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.select-btn:hover{
+    background:#333;
+}
+
+/* ================= MODAL ================= */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.4);
+    backdrop-filter:blur(3px);
+    z-index:1000;
+}
+
+.modal-content{
+    background:white;
+    margin:5% auto;
+    padding:2rem;
+    border-radius:12px;
+    width:90%;
+    max-width:550px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.15);
+}
+
+/* ================= FORM ================= */
+.form-group{
+    margin-bottom:1.3rem;
+}
+
+.form-group label{
+    font-weight:600;
+    display:block;
+    margin-bottom:.4rem;
+}
+
+.form-group input,
+.form-group textarea{
+    width:100%;
+    padding:.8rem;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+.form-group input:focus,
+.form-group textarea:focus{
+    outline:none;
+    border-color:black;
+}
+
+/* FILE UPLOAD */
+.file-upload-btn{
+    border:2px dashed #000;
+    padding:1.5rem;
+    text-align:center;
+    border-radius:8px;
+    background:#fafafa;
+}
+
+/* SUBMIT */
+.submit-vote-btn{
+    width:100%;
+    background:black;
+    color:white;
+    border:none;
+    padding:1rem;
+    border-radius:8px;
+    font-size:1.05rem;
+    cursor:pointer;
+}
+
+.submit-vote-btn:hover{
+    background:#333;
+}
+
+/* ERROR */
+.error-msg{
+    background:#fee2e2;
+    color:#b91c1c;
+    padding:1rem;
+    border-radius:8px;
+}
+
+/* ================= RESULTS PAGE ================= */
+
+.header{
+    text-align:center;
+    margin-bottom:3rem;
+}
+
+.header h1{
+    font-size:2.5rem;
+    font-weight:700;
+}
+
+.results-card{
+    background:white;
+    padding:2rem;
+    border-radius:15px;
+    border:1px solid #eee;
+    box-shadow:0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* BAR CHART */
+.chart-container{
+    height:400px;
+}
+
+.bar-chart{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-around;
+    height:100%;
+    gap:2rem;
+}
+
+.bar-wrapper{
+    flex:1;
+    text-align:center;
+}
+
+.bar-container{
+    height:300px;
+    display:flex;
+    align-items:flex-end;
+}
+
+.bar{
+    width:100%;
+    background:black;
+    border-radius:10px 10px 0 0;
+    transition:.4s;
+    color:white;
+    font-weight:bold;
+    display:flex;
+    justify-content:center;
+    padding-top:10px;
+}
+
+.bar:hover{
+    transform:scale(1.05);
+}
+
+/* LABELS */
+.candidate-name{
+    font-weight:600;
+    margin-top:10px;
+}
+
+.candidate-party{
+    font-size:.85rem;
+    color:#666;
+}
+
+/* STATS */
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:1.5rem;
+    margin:2rem 0;
+}
+
+.stat-box{
+    background:white;
+    padding:1.5rem;
+    border-radius:12px;
+    border:1px solid #eee;
+    text-align:center;
+}
+
+.stat-value{
+    font-size:2.2rem;
+    font-weight:bold;
+}
+
+.stat-label{
+    color:#555;
+}
+
+/* WINNER */
+.winner-section{
+    background:#f9fafb;
+    padding:2rem;
+    border-radius:12px;
+    text-align:center;
+    border:1px solid #eee;
+}
+
+.winner-icon{
+    font-size:3rem;
+    margin-bottom:1rem;
+}
+
+/* BACK BUTTON */
+.back-btn{
+    background:black;
+    color:white;
+    border:none;
+    padding:1rem 2rem;
+    border-radius:25px;
+    margin:2rem auto;
+    display:block;
+    cursor:pointer;
+}
+
+.back-btn:hover{
+    background:#333;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+.bar-chart{
+    flex-direction:column;
+    height:auto;
+}
+
+.bar-container{
+    height:60px;
+}
+
+.bar{
+    border-radius:0 10px 10px 0;
+    align-items:center;
+    padding-left:1rem;
+}
+}
+
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Election Results</h1>
+            <p>Live blockchain-verified voting results</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="totalVotes">0</div>
+                <div class="stat-label">Total Votes</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="candidateCount">0</div>
+                <div class="stat-label">Candidates</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="blockCount">0</div>
+                <div class="stat-label">Blockchain Blocks</div>
+            </div>
+        </div>
+
+        <div id="winnerSection"></div>
+
+        <div class="results-card">
+            <h2 style="text-align: center; color: #667eea; margin-bottom: 2rem;">
+                📊 Vote Distribution
+            </h2>
+            <div class="chart-container">
+                <div class="bar-chart" id="barChart">
+                    <div class="no-data">Loading results...</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="back-btn" onclick="goBack()">← Back to Dashboard</button>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        async function loadResults() {
+            try {
+                const response = await fetch(`${API_URL}/get_results`);
+                const data = await response.json();
+
+                // Update stats
+                document.getElementById('totalVotes').textContent = data.total_votes;
+                document.getElementById('candidateCount').textContent = data.results.length;
+                document.getElementById('blockCount').textContent = data.blockchain_length;
+
+                // Show winner
+                if (data.results.length > 0 && data.results[0].votes > 0) {
+                    showWinner(data.results[0]);
+                }
+
+                // Display chart
+                displayBarChart(data.results, data.total_votes);
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('barChart').innerHTML = 
+                    '<div class="no-data">Failed to load results. Please ensure the server is running.</div>';
+            }
+        }
+
+        function showWinner(winner) {
+            const winnerSection = document.getElementById('winnerSection');
+            winnerSection.innerHTML = `
+                <div class="winner-section">
+                    <div class="winner-icon">👑</div>
+                    <h2>Current Leader</h2>
+                    <div style="font-size: 3rem; margin: 1rem 0;">${winner.image}</div>
+                    <h2 style="font-size: 2rem;">${winner.name}</h2>
+                    <p>${winner.party}</p>
+                    <p style="font-size: 2rem; font-weight: bold; color: #667eea; margin-top: 1rem;">
+                        ${winner.votes} votes
+                    </p>
+                </div>
+            `;
+        }
+
+        function displayBarChart(results, totalVotes) {
+            const chartDiv = document.getElementById('barChart');
+            
+            if (results.length === 0 || totalVotes === 0) {
+                chartDiv.innerHTML = '<div class="no-data">No votes cast yet</div>';
+                return;
+            }
+
+            chartDiv.innerHTML = '';
+
+            // Find max votes for scaling
+            const maxVotes = Math.max(...results.map(r => r.votes));
+
+            results.forEach(candidate => {
+                const percentage = totalVotes > 0 ? (candidate.votes / totalVotes * 100).toFixed(1) : 0;
+                const height = maxVotes > 0 ? (candidate.votes / maxVotes * 100) : 0;
+
+                const barWrapper = document.createElement('div');
+                barWrapper.className = 'bar-wrapper';
+                barWrapper.innerHTML = `
+                    <div class="bar-container">
+                        <div class="bar" style="height: ${height}%">
+                            ${candidate.votes}
+                        </div>
+                    </div>
+                    <div class="bar-label">
+                        <div class="candidate-icon">${candidate.image}</div>
+                        <div class="candidate-name">${candidate.name}</div>
+                        <div class="candidate-party">${candidate.party}</div>
+                        <div style="color: #667eea; font-weight: bold; margin-top: 0.5rem;">
+                            ${percentage}%
+                        </div>
+                    </div>
+                `;
+                chartDiv.appendChild(barWrapper);
+            });
+        }
+
+        function goBack() {
+            const role = localStorage.getItem('role');
+            if (role === 'admin') {
+                window.location.href = 'admin_dashboard.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Load results on page load
+        loadResults();
+
+        // Auto-refresh every 5 seconds
+        setInterval(loadResults, 5000);
+    </script>
+</body>
+</html>

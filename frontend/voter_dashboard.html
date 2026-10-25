@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Dashboard - CryptoVote</title>
+  <style>
+
+/* ================= RESET ================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:#ffffff;
+    color:#111;
+    min-height:100vh;
+    padding-bottom:2rem;
+}
+
+/* ================= NAVBAR ================= */
+nav{
+    background:#ffffff;
+    padding:1rem 2rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #e5e7eb;
+    margin-bottom:2rem;
+}
+
+.logo{
+    font-size:1.6rem;
+    font-weight:700;
+}
+
+.nav-right{
+    display:flex;
+    gap:1rem;
+    align-items:center;
+}
+
+.results-link{
+    text-decoration:none;
+    padding:8px 16px;
+    border-radius:8px;
+    background:#f3f4f6;
+    color:#111;
+    transition:.3s;
+}
+
+.results-link:hover{
+    background:#e5e7eb;
+}
+
+.user-info{
+    display:flex;
+    gap:1rem;
+    align-items:center;
+}
+
+.logout-btn{
+    background:#111;
+    color:white;
+    border:none;
+    padding:8px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.logout-btn:hover{
+    background:#333;
+}
+
+/* ================= CONTAINER ================= */
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:0 2rem;
+}
+
+/* ================= WELCOME ================= */
+.welcome{
+    background:#ffffff;
+    padding:2rem;
+    border-radius:12px;
+    border:1px solid #eee;
+    box-shadow:0 8px 25px rgba(0,0,0,0.05);
+    margin-bottom:2rem;
+}
+
+.section-title{
+    font-size:1.8rem;
+    margin-bottom:1.5rem;
+    font-weight:600;
+}
+
+/* ================= CANDIDATES ================= */
+.candidates-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:2rem;
+}
+
+.candidate-card{
+    background:white;
+    border-radius:14px;
+    padding:2rem;
+    text-align:center;
+    border:1px solid #eee;
+    transition:.3s;
+    cursor:pointer;
+}
+
+.candidate-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 15px 35px rgba(0,0,0,0.08);
+}
+
+.candidate-card.selected{
+    border:2px solid black;
+}
+
+.candidate-image{
+    font-size:4rem;
+    margin-bottom:1rem;
+}
+
+.candidate-party{
+    color:#555;
+    margin-bottom:1rem;
+}
+
+.select-btn{
+    background:black;
+    color:white;
+    border:none;
+    padding:.8rem 2rem;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.select-btn:hover{
+    background:#333;
+}
+
+/* ================= MODAL ================= */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    backdrop-filter:blur(4px);
+    z-index:1000;
+    overflow-y:auto;
+}
+
+.modal-content{
+    background:white;
+    margin:4% auto;
+    padding:2.5rem;
+    border-radius:16px;
+    width:90%;
+    max-width:600px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.15);
+}
+
+/* HEADER */
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:2rem;
+    border-bottom:1px solid #eee;
+    padding-bottom:1rem;
+}
+
+.close{
+    font-size:28px;
+    cursor:pointer;
+    color:#555;
+}
+
+.close:hover{
+    color:black;
+}
+
+/* SELECTED DISPLAY */
+.selected-candidate-display{
+    background:#f9fafb;
+    padding:1.5rem;
+    border-radius:10px;
+    margin-bottom:2rem;
+}
+
+/* ================= FORM ================= */
+.form-group{
+    margin-bottom:1.5rem;
+}
+
+.form-group label{
+    font-weight:600;
+}
+
+.required{
+    color:red;
+}
+
+.form-group input,
+.form-group textarea{
+    width:100%;
+    padding:.9rem;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+.form-group input:focus,
+.form-group textarea:focus{
+    outline:none;
+    border-color:black;
+}
+
+/* FILE UPLOAD */
+.file-upload-btn{
+    background:#fafafa;
+    border:2px dashed #111;
+    padding:1.5rem;
+    border-radius:8px;
+    text-align:center;
+    cursor:pointer;
+}
+
+.file-info{
+    margin-top:.5rem;
+    padding:.5rem;
+    background:#f3f4f6;
+    border-radius:6px;
+    display:none;
+}
+
+.file-info.show{
+    display:block;
+}
+
+/* ================= SUBMIT ================= */
+.submit-vote-btn{
+    width:100%;
+    background:black;
+    color:white;
+    border:none;
+    padding:1.2rem;
+    border-radius:10px;
+    font-size:1.1rem;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.submit-vote-btn:hover:not(:disabled){
+    background:#333;
+}
+
+.submit-vote-btn:disabled{
+    opacity:.5;
+}
+
+/* ================= CONFIRMATION ================= */
+.info-section{
+    background:#f9fafb;
+    padding:1.5rem;
+    border-radius:10px;
+    margin-bottom:1rem;
+}
+
+.info-label{
+    font-weight:600;
+    color:#444;
+}
+
+.blockchain-info{
+    background:#f3f4f6;
+    padding:1.5rem;
+    border-radius:10px;
+}
+
+.hash-display{
+    background:white;
+    padding:.8rem;
+    border-radius:6px;
+    font-family:monospace;
+    border:1px solid #eee;
+}
+
+/* CLOSE BUTTON */
+.close-confirmation-btn{
+    width:100%;
+    background:black;
+    color:white;
+    border:none;
+    padding:1rem;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.close-confirmation-btn:hover{
+    background:#333;
+}
+
+/* ERROR */
+.error-msg{
+    background:#fee2e2;
+    color:#b91c1c;
+    padding:1rem;
+    border-radius:8px;
+    margin-top:1rem;
+    display:none;
+}
+
+</style>
+</head>
+<body>
+    <nav>
+        <div class="logo">🗳️ CryptoVote</div>
+        <div class="nav-right">
+            <a href="/results.html" class="results-link">📊 View Results</a>
+            <div class="user-info">
+                <span id="usernameDisplay">Voter</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome">
+            <h1>Welcome to CryptoVote</h1>
+            <p>Select your preferred candidate and cast your vote securely on the blockchain.</p>
+        </div>
+
+        <h2 class="section-title">📋 Select Your Candidate</h2>
+        <div class="candidates-grid" id="candidatesGrid">
+            <!-- Candidates will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Voter Details Modal -->
+    <div id="voterModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🗳️ Cast Your Vote</h2>
+                <span class="close" onclick="closeVoterModal()">&times;</span>
+            </div>
+
+            <div class="selected-candidate-display">
+                <div class="icon" id="modalCandidateIcon">👤</div>
+                <h3 id="modalCandidateName">Candidate Name</h3>
+                <p id="modalCandidateParty">Party Name</p>
+            </div>
+
+            <form id="voteForm">
+                <div class="form-group">
+                    <label for="voterName">Full Name <span class="required">*</span></label>
+                    <input type="text" id="voterName" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="voterId">Voter ID Number <span class="required">*</span></label>
+                    <input type="text" id="voterId" required placeholder="Enter your voter ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="voterAddress">Address <span class="required">*</span></label>
+                    <textarea id="voterAddress" required placeholder="Enter your complete address"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="voterPhone">Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="voterPhone" required placeholder="Enter your phone number">
+                </div>
+
+                <div class="form-group">
+                    <label>Upload ID Proof (PDF) <span class="required">*</span></label>
+                    <div class="file-upload">
+                        <label for="idProof" class="file-upload-btn">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+                            <div><strong>Click to upload your ID proof</strong></div>
+                            <div style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">PDF files only</div>
+                        </label>
+                        <input type="file" id="idProof" accept=".pdf" required>
+                    </div>
+                    <div class="file-info" id="fileInfo">
+                        <strong>📎 Selected:</strong> <span id="fileName"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-vote-btn">
+                    🔒 Submit Vote to Blockchain
+                </button>
+
+                <div class="error-msg" id="errorMsg"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal confirmation-modal">
+        <div class="modal-content">
+            <div class="confirmation-header">
+                <div class="success-icon">✅</div>
+                <h2>Vote Successfully Recorded!</h2>
+                <p style="color: #666;">Your vote has been securely added to the blockchain</p>
+            </div>
+
+            <div class="info-section">
+                <h3>👤 Voter Information</h3>
+                <div class="info-row">
+                    <div class="info-label">Name:</div>
+                    <div class="info-value" id="confVoterName"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Voter ID:</div>
+                    <div class="info-value" id="confVoterId"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Address:</div>
+                    <div class="info-value" id="confVoterAddress"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Phone:</div>
+                    <div class="info-value" id="confVoterPhone"></div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>🗳️ Vote Details</h3>
+                <div class="info-row">
+                    <div class="info-label">Candidate:</div>
+                    <div class="info-value" id="confCandidateName"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Party:</div>
+                    <div class="info-value" id="confCandidateParty"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Timestamp:</div>
+                    <div class="info-value" id="confTimestamp"></div>
+                </div>
+            </div>
+
+            <div class="blockchain-info">
+                <h3>🔗 Blockchain Information</h3>
+                <div class="info-row" style="border: none;">
+                    <div class="info-label">Block Index:</div>
+                    <div class="info-value" id="confBlockIndex"></div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <strong style="color: #2e7d32;">Current Block Hash:</strong>
+                    <div class="hash-display" id="confBlockHash"></div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <strong style="color: #2e7d32;">Previous Block Hash:</strong>
+                    <div class="hash-display" id="confPrevHash"></div>
+                </div>
+            </div>
+
+            <div class="id-proof-preview">
+                <h3>📄 ID Proof Submitted</h3>
+                <div class="pdf-icon">📋</div>
+                <p id="confIdProofName" style="color: #666;"></p>
+                <p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">Document securely stored</p>
+            </div>
+
+            <button class="close-confirmation-btn" onclick="closeConfirmation()">
+                Close & Return to Dashboard
+            </button>
+
+            <button class="close-confirmation-btn" onclick="downloadReceipt()" style="background: #28a745; margin-top: 1rem;">
+                📥 Download Vote Receipt
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let selectedCandidate = null;
+        let candidates = [];
+        let idProofBase64 = null;
+        let idProofFilename = null;
+        let currentVoteDetails = null;
+
+        // Check if user is logged in
+        const username = localStorage.getItem('username');
+        const role = localStorage.getItem('role');
+
+        if (!username || role !== 'voter') {
+            window.location.href = '/';
+        }
+
+        document.getElementById('usernameDisplay').textContent = username;
+
+        // Load candidates
+        async function loadCandidates() {
+            try {
+                const response = await fetch(`${API_URL}/get_candidates`);
+                const data = await response.json();
+                candidates = data.candidates;
+                displayCandidates(candidates);
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+                alert('Failed to load candidates. Please make sure the server is running.');
+            }
+        }
+
+        function displayCandidates(candidates) {
+            const grid = document.getElementById('candidatesGrid');
+            grid.innerHTML = '';
+
+            candidates.forEach(candidate => {
+                const card = document.createElement('div');
+                card.className = 'candidate-card';
+                card.innerHTML = `
+                    <div class="candidate-image">${candidate.image}</div>
+                    <h3>${candidate.name}</h3>
+                    <p class="candidate-party">${candidate.party}</p>
+                    <button class="select-btn" onclick="selectCandidate('${candidate.id}')">
+                        Select Candidate
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function selectCandidate(candidateId) {
+            selectedCandidate = candidates.find(c => c.id === candidateId);
+            
+            // Update UI
+            document.querySelectorAll('.candidate-card').forEach((card, index) => {
+                if (candidates[index].id === candidateId) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+
+            // Show voter details modal
+            document.getElementById('modalCandidateIcon').textContent = selectedCandidate.image;
+            document.getElementById('modalCandidateName').textContent = selectedCandidate.name;
+            document.getElementById('modalCandidateParty').textContent = selectedCandidate.party;
+            document.getElementById('voterModal').style.display = 'block';
+        }
+
+        function closeVoterModal() {
+            document.getElementById('voterModal').style.display = 'none';
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+
+        // Handle file upload
+        document.getElementById('idProof').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.type !== 'application/pdf') {
+                    alert('Please upload a PDF file only!');
+                    e.target.value = '';
+                    return;
+                }
+
+                idProofFilename = file.name;
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileInfo').classList.add('show');
+
+                // Convert to base64
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    idProofBase64 = event.target.result.split(',')[1]; // Remove data:application/pdf;base64, prefix
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('voteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!selectedCandidate) {
+                alert('Please select a candidate first!');
+                return;
+            }
+
+            if (!idProofBase64) {
+                alert('Please upload your ID proof!');
+                return;
+            }
+
+            const voterName = document.getElementById('voterName').value.trim();
+            const voterId = document.getElementById('voterId').value.trim();
+            const voterAddress = document.getElementById('voterAddress').value.trim();
+            const voterPhone = document.getElementById('voterPhone').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+
+            // Disable submit button
+            const submitBtn = document.querySelector('.submit-vote-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Submitting to Blockchain...';
+
+            try {
+                const voteData = {
+                    voter_id: voterId,
+                    candidate_id: selectedCandidate.id,
+                    voter_name: voterName,
+                    voter_address: voterAddress,
+                    voter_phone: voterPhone,
+                    id_proof_base64: idProofBase64,
+                    id_proof_filename: idProofFilename
+                };
+
+                console.log('Submitting vote data:', { ...voteData, id_proof_base64: '[BASE64_DATA]' });
+
+                const response = await fetch(`${API_URL}/submit_vote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(voteData)
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (response.ok && data.success) {
+                    // Close voter modal
+                    closeVoterModal();
+
+                    // Show confirmation modal with all details
+                    showConfirmation(data.vote_details);
+                } else {
+                    errorMsg.textContent = data.detail || 'Failed to submit vote';
+                    errorMsg.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '🔒 Submit Vote to Blockchain';
+                }
+            } catch (error) {
+                console.error('Error submitting vote:', error);
+                errorMsg.textContent = 'Connection error: ' + error.message;
+                errorMsg.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🔒 Submit Vote to Blockchain';
+            }
+        });
+
+        function showConfirmation(voteDetails) {
+            // Store vote details for download
+            currentVoteDetails = voteDetails;
+
+            // Populate voter information
+            document.getElementById('confVoterName').textContent = voteDetails.voter_name;
+            document.getElementById('confVoterId').textContent = voteDetails.voter_id;
+            document.getElementById('confVoterAddress').textContent = voteDetails.voter_address;
+            document.getElementById('confVoterPhone').textContent = voteDetails.voter_phone;
+
+            // Populate vote details
+            document.getElementById('confCandidateName').textContent = voteDetails.candidate_name;
+            document.getElementById('confCandidateParty').textContent = voteDetails.candidate_party;
+            document.getElementById('confTimestamp').textContent = new Date(voteDetails.timestamp).toLocaleString();
+
+            // Populate blockchain information
+            document.getElementById('confBlockIndex').textContent = voteDetails.block_index;
+            document.getElementById('confBlockHash').textContent = voteDetails.block_hash;
+            document.getElementById('confPrevHash').textContent = voteDetails.previous_hash;
+
+            // ID proof details
+            document.getElementById('confIdProofName').textContent = voteDetails.id_proof_filename;
+
+            // Show confirmation modal
+            document.getElementById('confirmationModal').style.display = 'block';
+        }
+
+        function closeConfirmation() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            // Reset form and redirect
+            document.getElementById('voteForm').reset();
+            document.getElementById('fileInfo').classList.remove('show');
+            
+            // Show success message on dashboard
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div style="background: white; padding: 3rem; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <div style="font-size: 5rem; margin-bottom: 1rem;">✅</div>
+                    <h2 style="color: #28a745; margin-bottom: 1rem;">Vote Successfully Recorded!</h2>
+                    <p style="color: #666; font-size: 1.2rem; margin-bottom: 2rem;">
+                        Thank you for participating in the democratic process. Your vote has been securely recorded on the blockchain.
+                    </p>
+                    <p style="color: #999; margin-bottom: 2rem;">
+                        You cannot vote again with the same Voter ID.
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <a href="/results.html" style="background: #667eea; color: white; padding: 1rem 2rem; border-radius: 25px; text-decoration: none; font-weight: bold;">
+                            📊 View Results
+                        </a>
+                        <button onclick="logout()" style="background: #6c757d; color: white; padding: 1rem 2rem; border-radius: 25px; border: none; font-weight: bold; cursor: pointer;">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function downloadReceipt() {
+            if (!currentVoteDetails) {
+                alert('No vote details available');
+                return;
+            }
+
+            const receipt = `
+╔════════════════════════════════════════════════════════════╗
+║              CRYPTOVOTE - VOTE RECEIPT                     ║
+║            Blockchain E-Voting System                      ║
+╚════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    VOTER INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Full Name:       ${currentVoteDetails.voter_name}
+Voter ID:        ${currentVoteDetails.voter_id}
+Address:         ${currentVoteDetails.voter_address}
+Phone Number:    ${currentVoteDetails.voter_phone}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    VOTE DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Candidate:       ${currentVoteDetails.candidate_name}
+Party:           ${currentVoteDetails.candidate_party}
+Vote Time:       ${new Date(currentVoteDetails.timestamp).toLocaleString()}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                BLOCKCHAIN VERIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Block Index:     ${currentVoteDetails.block_index}
+
+Current Hash:
+${currentVoteDetails.block_hash}
+
+Previous Hash:
+${currentVoteDetails.previous_hash}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                ID PROOF SUBMITTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Document:        ${currentVoteDetails.id_proof_filename}
+Status:          Securely Stored ✓
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  IMPORTANT NOTICE:
+This receipt confirms that your vote has been recorded on the
+blockchain. The vote is immutable and cannot be changed. Keep
+this receipt for your records.
+
+Generated: ${new Date().toLocaleString()}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Thank you for participating in the democratic process!
+
+CryptoVote - Secure, Transparent, Tamper-Proof
+            `.trim();
+
+            // Create blob and download
+            const blob = new Blob([receipt], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Vote_Receipt_${currentVoteDetails.voter_id}_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function logout() {
+            localStorage.removeItem('username');
+            localStorage.removeItem('role');
+            window.location.href = '/';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const voterModal = document.getElementById('voterModal');
+            const confirmationModal = document.getElementById('confirmationModal');
+            
+            if (event.target === voterModal) {
+                closeVoterModal();
+            }
+            if (event.target === confirmationModal) {
+                // Don't allow closing confirmation by clicking outside
+                // User must click the button
+            }
+        }
+
+        // Load candidates on page load
+        loadCandidates();
+    </script>
+</body>
+</html>

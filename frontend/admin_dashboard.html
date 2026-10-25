@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CryptoVote</title>
+  <style>
+
+/* ================= RESET ================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:#f9fafb;
+    min-height:100vh;
+    padding-bottom:2rem;
+    color:#111;
+}
+
+/* ================= NAVBAR ================= */
+nav{
+    background:#ffffff;
+    padding:1rem 2rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #e5e7eb;
+    margin-bottom:2rem;
+}
+
+.logo{
+    font-size:1.6rem;
+    font-weight:700;
+}
+
+.user-info{
+    display:flex;
+    gap:1rem;
+    align-items:center;
+}
+
+.logout-btn{
+    background:#111;
+    color:white;
+    border:none;
+    padding:8px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.logout-btn:hover{
+    background:#333;
+}
+
+/* ================= CONTAINER ================= */
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:0 2rem;
+}
+
+/* ================= HEADER ================= */
+.header{
+    background:white;
+    padding:2rem;
+    border-radius:14px;
+    margin-bottom:2rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border:1px solid #eee;
+    box-shadow:0 8px 20px rgba(0,0,0,0.05);
+}
+
+.refresh-btn{
+    background:black;
+    color:white;
+    border:none;
+    padding:.8rem 1.5rem;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.refresh-btn:hover{
+    background:#333;
+}
+
+/* ================= STATS ================= */
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:1.5rem;
+    margin-bottom:2rem;
+}
+
+.stat-card{
+    background:white;
+    padding:1.5rem;
+    border-radius:14px;
+    text-align:center;
+    border:1px solid #eee;
+    box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.stat-icon{
+    font-size:2.5rem;
+    margin-bottom:.5rem;
+}
+
+.stat-value{
+    font-size:2rem;
+    font-weight:bold;
+}
+
+.stat-label{
+    color:#666;
+    font-size:.9rem;
+}
+
+/* ================= RESULTS ================= */
+.results-section{
+    background:white;
+    padding:2rem;
+    border-radius:14px;
+    border:1px solid #eee;
+    box-shadow:0 6px 20px rgba(0,0,0,0.05);
+    margin-bottom:2rem;
+}
+
+.results-section h2{
+    margin-bottom:1.5rem;
+}
+
+.candidate-result{
+    display:flex;
+    align-items:center;
+    padding:1.5rem;
+    margin-bottom:1rem;
+    background:#f9fafb;
+    border-radius:10px;
+    transition:.25s;
+}
+
+.candidate-result:hover{
+    transform:translateX(6px);
+    background:#f3f4f6;
+}
+
+.rank{
+    font-size:1.5rem;
+    font-weight:bold;
+    width:50px;
+}
+
+.candidate-icon{
+    font-size:3rem;
+    margin:0 1rem;
+}
+
+.candidate-info h3{
+    margin-bottom:.3rem;
+}
+
+.candidate-info p{
+    color:#666;
+    font-size:.9rem;
+}
+
+/* VOTES */
+.vote-count{
+    text-align:center;
+}
+
+.vote-number{
+    font-size:2rem;
+    font-weight:bold;
+}
+
+.vote-label{
+    color:#666;
+    font-size:.9rem;
+}
+
+/* PROGRESS BAR */
+.progress-bar{
+    width:100%;
+    height:8px;
+    background:#e5e7eb;
+    border-radius:6px;
+    overflow:hidden;
+    margin-top:.6rem;
+}
+
+.progress-fill{
+    height:100%;
+    background:black;
+    transition:width .6s ease;
+}
+
+/* ================= BLOCKCHAIN ================= */
+.blockchain-section{
+    background:white;
+    padding:2rem;
+    border-radius:14px;
+    border:1px solid #eee;
+    box-shadow:0 6px 20px rgba(0,0,0,0.05);
+}
+
+.blockchain-status{
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    padding:1rem;
+    background:#f3f4f6;
+    border-left:4px solid black;
+    border-radius:8px;
+}
+
+.status-icon{
+    font-size:2rem;
+}
+
+/* ================= EMPTY ================= */
+.no-results{
+    text-align:center;
+    padding:3rem;
+    color:#555;
+}
+
+/* ================= WINNER ================= */
+.winner-badge{
+    background:black;
+    color:white;
+    padding:.3rem .9rem;
+    border-radius:20px;
+    font-size:.8rem;
+    font-weight:bold;
+    margin-left:1rem;
+}
+
+</style>
+</head>
+<body>
+    <nav>
+        <div class="logo">🗳️ CryptoVote Admin</div>
+        <div class="user-info">
+            <a href="/results.html" style="color:black; text-decoration: none; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 20px; margin-right: 1rem; transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                📊 View Results Page
+            </a>
+            <span id="usernameDisplay">Admin</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p>Real-time voting results and blockchain status</p>
+            </div>
+            <button class="refresh-btn" onclick="loadResults()">🔄 Refresh Results</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value" id="totalVotes">0</div>
+                <div class="stat-label">Total Votes Cast</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔗</div>
+                <div class="stat-value" id="blockchainLength">0</div>
+                <div class="stat-label">Blockchain Blocks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="candidateCount">0</div>
+                <div class="stat-label">Total Candidates</div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2>📈 Live Voting Results</h2>
+            <div id="resultsContainer">
+                <div class="no-results">Loading results...</div>
+            </div>
+        </div>
+
+        <div class="blockchain-section">
+            <h2>🔐 Blockchain Status</h2>
+            <div class="blockchain-status" id="blockchainStatus">
+                <div class="status-icon">⏳</div>
+                <div>
+                    <strong>Validating blockchain...</strong>
+                    <p style="margin: 0; color: #666; font-size: 0.9rem;">Please wait</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        // Check if user is logged in as admin
+        const username = localStorage.getItem('username');
+        const role = localStorage.getItem('role');
+
+        if (!username || role !== 'admin') {
+            window.location.href = 'index.html';
+        }
+
+        document.getElementById('usernameDisplay').textContent = username;
+
+        async function loadResults() {
+            try {
+                const response = await fetch(`${API_URL}/get_results`);
+                const data = await response.json();
+
+                // Update stats
+                document.getElementById('totalVotes').textContent = data.total_votes;
+                document.getElementById('blockchainLength').textContent = data.blockchain_length;
+                document.getElementById('candidateCount').textContent = data.results.length;
+
+                // Display results
+                displayResults(data.results, data.total_votes);
+
+                // Validate blockchain
+                validateBlockchain();
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('resultsContainer').innerHTML = 
+                    '<div class="no-results">Failed to load results. Please ensure the server is running.</div>';
+            }
+        }
+
+        function displayResults(results, totalVotes) {
+            const container = document.getElementById('resultsContainer');
+            
+            if (results.length === 0 || totalVotes === 0) {
+                container.innerHTML = '<div class="no-results">No votes cast yet</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            results.forEach((candidate, index) => {
+                const percentage = totalVotes > 0 ? (candidate.votes / totalVotes * 100).toFixed(1) : 0;
+                const isWinner = index === 0 && candidate.votes > 0;
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'candidate-result';
+                resultDiv.innerHTML = `
+                    <div class="rank">#${index + 1}</div>
+                    <div class="candidate-icon">${candidate.image}</div>
+                    <div class="candidate-info">
+                        <h3>
+                            ${candidate.name}
+                            ${isWinner ? '<span class="winner-badge">🏆 Leading</span>' : ''}
+                        </h3>
+                        <p>${candidate.party}</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <p style="margin-top: 0.5rem; color: #667eea; font-weight: bold;">${percentage}%</p>
+                    </div>
+                    <div class="vote-count">
+                        <div class="vote-number">${candidate.votes}</div>
+                        <div class="vote-label">votes</div>
+                    </div>
+                `;
+                container.appendChild(resultDiv);
+            });
+        }
+
+        async function validateBlockchain() {
+            try {
+                const response = await fetch(`${API_URL}/validate_chain`);
+                const data = await response.json();
+
+                const statusDiv = document.getElementById('blockchainStatus');
+                
+                if (data.valid) {
+                    statusDiv.innerHTML = `
+                        <div class="status-icon">✅</div>
+                        <div>
+                            <strong>${data.message}</strong>
+                            <p style="margin: 0; color: #666; font-size: 0.9rem;">
+                                All ${data.chain_length} blocks verified and secure
+                            </p>
+                        </div>
+                    `;
+                    statusDiv.style.background = '#f0fff4';
+                    statusDiv.style.borderColor = '#28a745';
+                } else {
+                    statusDiv.innerHTML = `
+                        <div class="status-icon">❌</div>
+                        <div>
+                            <strong>${data.message}</strong>
+                            <p style="margin: 0; color: #666; font-size: 0.9rem;">
+                                Blockchain integrity compromised!
+                            </p>
+                        </div>
+                    `;
+                    statusDiv.style.background = '#fff0f0';
+                    statusDiv.style.borderColor = '#dc3545';
+                }
+            } catch (error) {
+                console.error('Error validating blockchain:', error);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('username');
+            localStorage.removeItem('role');
+            window.location.href = 'index.html';
+        }
+
+        // Load results on page load
+        loadResults();
+
+        // Auto-refresh every 10 seconds
+        setInterval(loadResults, 10000);
+    </script>
+</body>
+</html>
